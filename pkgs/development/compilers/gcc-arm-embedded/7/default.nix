@@ -11,23 +11,14 @@ stdenv.mkDerivation rec {
 
   src = fetchurl { url=urlString; sha256="0sgysp3hfpgrkcbfiwkp0a7ymqs02khfbrjabm52b5z61sgi05xv"; };
 
-  phases = [ "unpackPhase" "installPhase" "fixupPhase" ];
-
   installPhase = ''
     mkdir -p $out
     cp -r * $out
   '';
 
-  dontPatchELF = true;
-  dontStrip = true;
+  nativeBuildInputs = [ autoPatchelfHook ];
 
-  preFixup = ''
-    find $out -type f | while read f; do
-      patchelf $f > /dev/null 2>&1 || continue
-      patchelf --set-interpreter $(cat ${stdenv.cc}/nix-support/dynamic-linker) "$f" || true
-      patchelf --set-rpath ${stdenv.lib.makeLibraryPath [ "$out" stdenv.cc.cc ncurses5 python27 ]} "$f" || true
-    done
-  '';
+  buildInputs = [ stdenv.cc.cc ncurses5 python27 ];
 
   meta = {
     description = "Pre-built GNU toolchain from ARM Cortex-M & Cortex-R processors (Cortex-M0/M0+/M3/M4/M7, Cortex-R4/R5/R7/R8)";
