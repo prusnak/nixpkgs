@@ -26186,4 +26186,6 @@ in
   fluxboxlauncher = callPackage ../applications/misc/fluxboxlauncher {};
 
   btcdeb = callPackage ../applications/blockchains/btcdeb {};
+
+  jlink = callPackage ../development/tools/jlink {};
 }
