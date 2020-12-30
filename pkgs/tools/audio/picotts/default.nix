@@ -1,24 +1,32 @@
-{ stdenv, fetchFromGitHub, autoconf, automake, libtool, popt }:
+{ stdenv
+, fetchFromGitHub
+, autoreconfHook
+, libtool
+, popt
+}:
 
-stdenv.mkDerivation {
-  name = "picotts-unstable-2018-10-19";
+stdenv.mkDerivation rec {
+  pname = "picotts";
+  version = "unstable-2019-09-12";
+
   src = fetchFromGitHub {
-    repo = "picotts";
     owner = "naggety";
-    rev = "2f86050dc5da9ab68fc61510b594d8e6975c4d2d";
-    sha256 = "1k2mdv9llkh77jr4qr68yf0zgjqk87np35fgfmnc3rpdp538sccl";
+    repo = pname;
+    rev = "e3ba46009ee868911fa0b53db672a55f9cc13b1c";
+    sha256 = "0k3m7vh1ak9gmxd83x29cvhzfkybgz5hnlhd9xj19l1bjyx84s8v";
   };
-  nativeBuildInputs = [ autoconf automake ];
+
+  nativeBuildInputs = [ autoreconfHook ];
+
   buildInputs = [ libtool popt ];
+
   sourceRoot = "source/pico";
-  preConfigure = "./autogen.sh";
-  meta = {
+
+  meta = with stdenv.lib; {
     description = "Text to speech voice sinthesizer from SVox";
     homepage = "https://github.com/naggety/picotts";
-    license = stdenv.lib.licenses.asl20;
-    maintainers = [ stdenv.lib.maintainers.canndrew ];
-    platforms = stdenv.lib.platforms.linux;
+    license = licenses.asl20;
+    maintainers = with maintainers; [ canndrew ];
+    platforms = platforms.linux;
   };
 }
-
-
