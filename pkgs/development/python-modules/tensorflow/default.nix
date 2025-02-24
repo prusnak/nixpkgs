@@ -111,15 +111,11 @@ let
     else
       originalStdenv;
   inherit (cudaPackages) cudatoolkit nccl;
-  # use compatible cuDNN (https://www.tensorflow.org/install/source#gpu)
-  # cudaPackages.cudnn led to this:
-  # https://github.com/tensorflow/tensorflow/issues/60398
-  cudnnAttribute = "cudnn_8_6";
   cudnnMerged = symlinkJoin {
     name = "cudnn-merged";
     paths = [
-      (lib.getDev cudaPackages.${cudnnAttribute})
-      (lib.getLib cudaPackages.${cudnnAttribute})
+      (lib.getDev cudaPackages.cudnn)
+      (lib.getLib cudaPackages.cudnn)
     ];
   };
   gentoo-patches = fetchzip {
@@ -180,7 +176,7 @@ let
 
   tfFeature = x: if x then "1" else "0";
 
-  version = "2.13.0";
+  version = "2.19.0";
   format = "setuptools";
   variant = lib.optionalString cudaSupport "-gpu";
   pname = "tensorflow${variant}";
@@ -293,7 +289,7 @@ let
       owner = "tensorflow";
       repo = "tensorflow";
       tag = "v${version}";
-      hash = "sha256-Rq5pAVmxlWBVnph20fkAwbfy+iuBNlfFy14poDPd5h0=";
+      hash = "sha256-0000000000000000000000000000000000000000000=";
     };
 
     # On update, it can be useful to steal the changes from gentoo
@@ -595,7 +591,6 @@ let
         broken =
           stdenv.hostPlatform.isDarwin
           || !(xlaSupport -> cudaSupport)
-          || !(cudaSupport -> builtins.hasAttr cudnnAttribute cudaPackages)
           || !(cudaSupport -> cudaPackages ? cudatoolkit);
       }
       // lib.optionalAttrs stdenv.hostPlatform.isDarwin {
@@ -607,7 +602,6 @@ in
 buildPythonPackage {
   __structuredAttrs = true;
   inherit version pname;
-  disabled = pythonAtLeast "3.12";
 
   src = bazel-build.python;
 
